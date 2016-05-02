@@ -3,7 +3,10 @@
     标题：<br>
     <input type="text" name="title"><br>
     正文：<br>
-    <textarea name="post" rows="20" cols="100"></textarea><br>
+    <!--<textarea name="post" rows="20" cols="100"></textarea><br>-->
+    <textarea id="editor_id" name="post" style="width:700px;height:300px;">
+        &lt;strong&gt;HTML内容&lt;/strong&gt;
+    </textarea>
     <input type="submit" value="发表">
 </form>
 <%- include footer %>

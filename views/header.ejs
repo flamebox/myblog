@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <title>Blog</title>
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <script charset="utf-8" src="/kindeditor/kindeditor-all-min.js"></script>
+    <script charset="utf-8" src="/kindeditor/lang/zh-CN.js"></script>
+    <script>
+        var options = {
+            uploadJson: '/uploadImg'
+        };
+        KindEditor.ready(function (K) {
+            window.editor = K.create('#editor_id',options);
+        });
+    </script>
 </head>
 <body>
 
@@ -11,6 +21,7 @@
 <nav>
     <span><a title="主页" href="/">home</a></span>
     <% if(user) { %>
+    <span><a title="上传" href="/upload">upload</a></span>
     <span><a title="发表" href="/post">post</a></span>
     <span><a title="登出" href="/logout">logout</a></span>
     <% } else { %>

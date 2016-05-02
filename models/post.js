@@ -2,6 +2,7 @@
  * Created by flamebox on 2016/4/29.
  */
 var mongodb = require('./db');
+var markdown = require('markdown').markdown;
 
 function Post(name, title, post) {
     this.name = name;
@@ -28,7 +29,8 @@ Post.prototype.save = function (callbak) {
         name: this.name,
         time: time,
         title: this.title,
-        post: this.post
+        post: this.post,
+        comments: []
     }
     //打开数据库
     mongodb.open(function (err, db) {
@@ -56,7 +58,7 @@ Post.prototype.save = function (callbak) {
 };
 
 //从数据库读取文章及相关信息
-Post.get = function (name, callback) {
+Post.getAll = function (name, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -77,7 +79,128 @@ Post.get = function (name, callback) {
                 if (err) {
                     return callback(err);
                 }
+                //解析 markdown 为html
+                //docs.forEach(function (doc) {
+                //    doc.post = markdown.toHTML(doc.post);
+                //});
                 callback(null, docs);    //读取成功，以数组形式返回查询结果
+            });
+        });
+    });
+};
+//获取一篇文章
+Post.getOne = function (name, day, title, callback) {
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            //根据用户名\发表日期\文章名检索文章
+            collection.findOne({
+                "name": name,
+                "time.day": day,
+                "title": title
+            }, function (err, doc) {
+                mongodb.close();
+                if (err) {
+                    return callback(err);
+                }
+                //解析markdown 为html
+                //if (doc) {
+                //    doc.post = markdown.toHTML(doc.post);
+                //    if (doc.comments) {
+                //        doc.comments.forEach(function (comment) {
+                //            comment.content = markdown.toHTML(comment.content);
+                //        });
+                //    }
+                //}
+                callback(null, doc);    //返回成功查询出的一篇文章
+            });
+        });
+    });
+};
+
+//返回原始发表内容的markdown格式
+Post.edit = function (name, day, title, callback) {
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            collection.findOne({
+                "name": name,
+                "time.day": day,
+                "title": title
+            }, function (err, doc) {
+                mongodb.close();
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, doc); //返回查询的一篇文章,markdown格式
+            });
+        });
+    });
+};
+
+//更新一遍文章及相关信息
+Post.update = function (name, day, title, post, callback) {
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            collection.update({
+                "name": name,
+                "time.day": day,
+                "title": title
+            }, {
+                $set: {post: post}
+            }, function (err) {
+                mongodb.close();
+                if (err) {
+                    return callback(err);
+                }
+                callback(null); //保存成功
+            });
+        });
+    });
+};
+
+//删除一篇文章
+Post.remove = function (name, day, title, callback) {
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            collection.remove({
+                "name": name,
+                "time.day": day,
+                "title": title
+            }, {
+                w: 1
+            }, function (err) {
+                mongodb.close();
+                if (err) {
+                    return callback(err);
+                }
+                callback(null); //保存成功
             });
         });
     });
