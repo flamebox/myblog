@@ -30,7 +30,7 @@ Post.prototype.save = function (callbak) {
         time: time,
         title: this.title,
         post: this.post,
-        comments: []
+        comments: []    //数组形式
     }
     //打开数据库
     mongodb.open(function (err, db) {
@@ -124,7 +124,7 @@ Post.getOne = function (name, day, title, callback) {
     });
 };
 
-//返回原始发表内容的markdown格式
+//返回发表内容
 Post.edit = function (name, day, title, callback) {
     mongodb.open(function (err, db) {
         if (err) {
@@ -144,7 +144,7 @@ Post.edit = function (name, day, title, callback) {
                 if (err) {
                     return callback(err);
                 }
-                callback(null, doc); //返回查询的一篇文章,markdown格式
+                callback(null, doc); //返回查询到的一篇文章
             });
         });
     });
@@ -200,7 +200,7 @@ Post.remove = function (name, day, title, callback) {
                 if (err) {
                     return callback(err);
                 }
-                callback(null); //保存成功
+                callback(null); //删除成功
             });
         });
     });

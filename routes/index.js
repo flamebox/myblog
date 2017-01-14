@@ -3,6 +3,7 @@ var crypto = require('crypto');
 User = require('../models/user.js');
 Post = require('../models/post.js');
 Comment = require('../models/comments.js');
+Mymqtt = require('../models/mqtt.js');
 
 module.exports = function (app) {
     app.get('/', function (req, res) {
@@ -20,6 +21,25 @@ module.exports = function (app) {
         });
     })
 
+    app.get('/power', function (req, res) {
+        Mymqtt.show(function (err, mqttData) {
+            if (err) {
+                console.log(err);
+            }
+            res.render('power', {
+                id: mqttData[0].ID,
+                u: mqttData[0].U,
+                i: mqttData[0].I,
+                h: mqttData[0].H,
+                t: mqttData[0].T,
+                p: mqttData[0].P,
+                e: mqttData[0].E,
+                time:  mqttData[0].time
+            });
+
+        });
+    });
+
     app.get('/reg', checkNotLogin);
     app.get('/reg', function (req, res) {
         res.render('reg', {
@@ -34,7 +54,12 @@ module.exports = function (app) {
     app.post('/reg', function (req, res) {
         var name = req.body.name,
             password = req.body.password,
-            password_re = req.body['password-repeat'];
+            password_re = req.body['password-repeat'],
+            email = req.body.email;
+        if (!(name && password && password_re && email)) {
+            req.flash('error', '任意一项不能为空！');
+            return res.redirect('/reg');//返回注册页
+        }
         //检测两次输入的密码是否一致
         if (password_re != password) {
             req.flash('error', '两次输入的密码不一致！');
@@ -46,8 +71,8 @@ module.exports = function (app) {
         var newUser = new User({
             name: req.body.name,
             password: password,
-            email: req.body.email
-        })
+            email: email
+        });
         //检查用户名是否已经存在
         User.get(newUser.name, function (err, user) {
             if (err) {
@@ -118,6 +143,10 @@ module.exports = function (app) {
     app.post('/post', function (req, res) {
         var currentUser = req.session.user,
             post = new Post(currentUser.name, req.body.title, req.body.post);
+        if (!req.body.title) {
+            req.flash('error', '标题不能为空！');
+            return res.redirect('/');
+        }
         post.save(function (err) {
             if (err) {
                 req.flash('error', err);
@@ -204,12 +233,12 @@ module.exports = function (app) {
             content: req.body.content
         };
         var newContent = new Comment(req.params.name, req.params.day, req.params.title, comment);
-        newContent.save(function(err){
-            if(err) {
-                req.flash('error',err);
+        newContent.save(function (err) {
+            if (err) {
+                req.flash('error', err);
                 return res.redirect('back')
             }
-            req.flash('success','留言成功!')
+            req.flash('success', '留言成功!')
             res.redirect('back');
         });
     });
@@ -259,10 +288,10 @@ module.exports = function (app) {
         });
     });
 
-    app.post('/uploadImg', function(req, res) {
+    app.post('/uploadImg', function (req, res) {
         //req.flash('success', '文件上传成功!');
-        var index= req.body.localUrl.match(/path/).index + 5;   //获取post图片的地址索引 example：C:\fakepath\13.jpg
-        var url = '/images/'+ req.body.localUrl.substr(index);  //合成 '/images/xxxx.jpg'路径
+        var index = req.body.localUrl.match(/path/).index + 5;   //获取post图片的地址索引 example：C:\fakepath\13.jpg
+        var url = '/images/' + req.body.localUrl.substr(index);  //合成 '/images/xxxx.jpg'路径
         var info = {
             "error": 0,
             "url": url

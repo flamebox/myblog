@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Blog</title>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script charset="utf-8" src="/kindeditor/kindeditor-all-min.js"></script>
     <script charset="utf-8" src="/kindeditor/lang/zh-CN.js"></script>
     <script>
@@ -11,29 +14,47 @@
             uploadJson: '/uploadImg'
         };
         KindEditor.ready(function (K) {
-            window.editor = K.create('#editor_id',options);
+            window.editor = K.create('#editor_id', options);
         });
     </script>
 </head>
 <body>
+<div class="container">
+    <div class="jumbotron">
+        <div class="container">
+            <h2>欢迎来到我的BLOG！</h2>
+            <p>这是我的地盘，欢迎畅所欲言！</p>
+            <p><a class="btn btn-primary btn-lg" href="/power" role="button">Learn more &raquo;</a></p>
+        </div>
+    </div>
+    <ul class="nav nav-pills">
+        <li id="home" role="presentation" class="active"><a href="/">Home</a></li>
+        <% if(user) { %>
+        <li id="upload" role="presentation"><a href="/upload">upload</a></li>
+        <li id="post" role="presentation"><a href="/post">post</a></li>
+        <li id="logout" role="presentation"><a href="/logout">logout</a></li>
+        <% } else { %>
+        <li id="login" role="presentation"><a href="/login">login</a></li>
+        <li id="register" role="presentation"><a href="/reg">register</a></li>
+        <% } %>
+    </ul>
+    <header><h1><%= title %></h1></header>
+    <!--<nav>-->
+    <!--<span><a title="主页" href="/">home</a></span>-->
+    <!--<% if(user) { %>-->
+    <!--<span><a title="上传" href="/upload">upload</a></span>-->
+    <!--<span><a title="发表" href="/post">post</a></span>-->
+    <!--<span><a title="登出" href="/logout">logout</a></span>-->
+    <!--<% } else { %>-->
+    <!--<span><a title="登录" href="/login">login</a></span>-->
+    <!--<span><a title="注册" href="/reg">register</a></span>-->
+    <!--<% } %>-->
+    <!--</nav>-->
 
-<header><h1><%= title %></h1></header>
-<nav>
-    <span><a title="主页" href="/">home</a></span>
-    <% if(user) { %>
-    <span><a title="上传" href="/upload">upload</a></span>
-    <span><a title="发表" href="/post">post</a></span>
-    <span><a title="登出" href="/logout">logout</a></span>
-    <% } else { %>
-    <span><a title="登录" href="/login">login</a></span>
-    <span><a title="注册" href="/reg">register</a></span>
-    <% } %>
-</nav>
-
-<article>
-    <% if(success) { %>
-    <div style="color: lawngreen"><%= success %></div>
-    <% } %>
-    <% if(error) { %>
-    <div style="color: crimson"><%= error %></div>
-    <% } %>
+    <article>
+        <% if(success) { %>
+        <div style="color: lawngreen"><%= success %></div>
+        <% } %>
+        <% if(error) { %>
+        <div style="color: crimson"><%= error %></div>
+        <% } %>

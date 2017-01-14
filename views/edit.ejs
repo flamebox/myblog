@@ -1,4 +1,10 @@
 <%- include header %>
+<script>
+    $(document).ready(function() {
+        $("li.active").removeClass("active");
+        $("li#home").addClass("active");
+    });
+</script>
 <form method="post">
     标题：<br>
     <input type="text" name="title" value="<%= post.title %>" disabled="disabled"><br>
